@@ -713,9 +713,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MDY-wS-Vn0" userLabel="searchBox">
-                                <rect key="frame" x="5" y="215" width="470" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MDY-wS-Vn0" userLabel="searchBox">
+                                <rect key="frame" x="8" y="226" width="464" height="36"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" placeholderString="hi" drawsBackground="YES" id="naT-Ld-h9O">
                                     <font key="font" size="25" name=".SFNSDisplay"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -723,6 +722,11 @@
                                 </textFieldCell>
                             </textField>
                         </subviews>
+                        <constraints>
+                            <constraint firstItem="MDY-wS-Vn0" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="8" id="TmR-uB-GY2"/>
+                            <constraint firstAttribute="trailing" secondItem="MDY-wS-Vn0" secondAttribute="trailing" constant="8" id="sYL-8T-ftG"/>
+                            <constraint firstItem="MDY-wS-Vn0" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="8" id="v0t-rt-qAE"/>
+                        </constraints>
                     </view>
                     <connections>
                         <outlet property="searchBox" destination="MDY-wS-Vn0" id="d1Q-eQ-uFb"/>

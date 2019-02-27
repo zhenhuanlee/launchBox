@@ -11,8 +11,9 @@
 @interface ViewController() <NSTextFieldDelegate, NSTableViewDelegate, NSTableViewDataSource> {
     NSTableView *_tableView;
     NSTableCellView *_cellView;
+    NSMutableArray *_arr;
+    
 }
-
 
 @property (weak) IBOutlet NSTextField *searchBox;
 
@@ -22,10 +23,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _arr = [NSMutableArray array];
 
     // Do any additional setup after loading the view.
     [self createTableView];
     [self editSearchBoxView];
+    
+    [self getFilesUnderApplicationFolder ];
 }
 
 
@@ -36,23 +40,27 @@
 }
 
 -(void)controlTextDidChange:(NSNotification *)obj {
-    NSLog(@"zl");
+    [_arr addObject:@"123"];
+    NSLog(@"%@", _searchBox.stringValue);
+    [_tableView reloadData];
 }
 
 - (void)createTableView {
-    NSLog(@"create view");
+    CGSize size = self.view.frame.size;
     //
-    _tableView = [[NSTableView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    _tableView = [[NSTableView alloc] init];
+    [_tableView setHeaderView:nil];
+    [_tableView setDelegate:self];
+    [_tableView setDataSource:self];
+    
     //
     NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier:@"column first"];
-    column.title = @"col";
-    [column setWidth:100];
+    [column setWidth:size.width-2];
     [_tableView addTableColumn:column];
     
     //
-    CGSize size = self.view.frame.size;
     NSScrollView *tableContainerView = [[NSScrollView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height-50)];
-    [_tableView setHeaderView:nil];
+    
     [tableContainerView setDocumentView:_tableView];
     
     [self.view addSubview:tableContainerView];
@@ -65,14 +73,46 @@
     [_searchBox setBackgroundColor: [NSColor clearColor]];
 }
 
-#pragma mark - tableview delegate
+#pragma mark - tableview delegate & tableview datasource
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    return 10;
+    return [_arr count];
 }
 
-#pragma mark - tableview datasource
-- (id)valueAtIndex:(NSUInteger)index inPropertyWithKey:(NSString *)key {
-    return @"xx";
+- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
+    return 30;
+}
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    NSString *strIdt = @"123";
+    NSTextField *cell = [tableView makeViewWithIdentifier:strIdt owner:self];
+    if (!cell) {
+//        cell = [[NSTableCellView alloc] init];
+        cell = [[NSTextField alloc] init];
+        cell.identifier = strIdt;
+    }
+    [cell setEditable:NO];
+    cell.wantsLayer = YES;
+    [cell setBackgroundColor:[NSColor clearColor]];
+    [cell setBordered:NO];
+    cell.stringValue = [_arr objectAtIndex:row];
+    return cell;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification {
+    NSInteger row = [_tableView selectedRow];
+    NSLog(@"%ld", row);
+}
+
+- (void)getFilesUnderApplicationFolder {
+    NSString *docPath = @"/Applications";
+    NSArray *dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:nil];
+    _arr = dirs;
+    NSLog([@"你好" stringByApplyingTransform])
+//    NSString *filename;
+//    for(filename in dirs) {
+//
+//    }
+//    [[NSWorkspace sharedWorkspace] launchApplication:@"/Applications/Safari.app"];
 }
 
 @end
