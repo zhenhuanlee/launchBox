@@ -40,6 +40,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		85CE05442226356000CD711A /* cell */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = cell;
+			sourceTree = "<group>";
+		};
 		85DA7B8B2224DEC30092D704 = {
 			isa = PBXGroup;
 			children = (
@@ -59,6 +66,7 @@
 		85DA7B962224DEC30092D704 /* launch-box */ = {
 			isa = PBXGroup;
 			children = (
+				85CE05442226356000CD711A /* cell */,
 				85DA7B972224DEC30092D704 /* AppDelegate.h */,
 				85DA7B982224DEC30092D704 /* AppDelegate.m */,
 				85DA7B9A2224DEC30092D704 /* ViewController.h */,
