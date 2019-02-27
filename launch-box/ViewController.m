@@ -11,8 +11,8 @@
 @interface ViewController() <NSTextFieldDelegate, NSTableViewDelegate, NSTableViewDataSource> {
     NSTableView *_tableView;
     NSTableCellView *_cellView;
-    NSMutableArray *_arr;
-    
+    NSMutableArray *_apps;
+    NSMutableArray *_matchedApps;
 }
 
 @property (weak) IBOutlet NSTextField *searchBox;
@@ -23,7 +23,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _arr = [NSMutableArray array];
+    _apps = [NSMutableArray array];
+    _matchedApps = [NSMutableArray array];
 
     // Do any additional setup after loading the view.
     [self createTableView];
@@ -40,8 +41,15 @@
 }
 
 -(void)controlTextDidChange:(NSNotification *)obj {
-    [_arr addObject:@"123"];
-    NSLog(@"%@", _searchBox.stringValue);
+    [_matchedApps removeAllObjects];
+    
+    NSArray *foo;
+    for(foo in _apps) {
+        if ([[foo objectAtIndex:0] rangeOfString:_searchBox.stringValue].location != NSNotFound) {
+            [_matchedApps addObject:foo];
+        }
+    }
+    
     [_tableView reloadData];
 }
 
@@ -75,7 +83,7 @@
 
 #pragma mark - tableview delegate & tableview datasource
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    return [_arr count];
+    return [_matchedApps count];
 }
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
@@ -94,7 +102,7 @@
     cell.wantsLayer = YES;
     [cell setBackgroundColor:[NSColor clearColor]];
     [cell setBordered:NO];
-    cell.stringValue = [_arr objectAtIndex:row];
+    cell.stringValue = [[_matchedApps objectAtIndex:row] objectAtIndex:1];
     return cell;
 }
 
@@ -106,13 +114,33 @@
 - (void)getFilesUnderApplicationFolder {
     NSString *docPath = @"/Applications";
     NSArray *dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:nil];
-    _arr = dirs;
-    NSLog([@"你好" stringByApplyingTransform])
-//    NSString *filename;
-//    for(filename in dirs) {
-//
-//    }
-//    [[NSWorkspace sharedWorkspace] launchApplication:@"/Applications/Safari.app"];
+    NSString *filename;
+
+    for(filename in dirs) {
+        NSArray *_foo = [NSArray arrayWithObjects:[self transChineseStringToPingyin:filename], filename, nil];
+        [_apps addObject:_foo];
+    }
+//    NSLog(@"%@", _apps);
+}
+
+- (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
+    if (commandSelector == @selector(insertNewline:)) {
+        NSString *appName = [[_matchedApps objectAtIndex:0] objectAtIndex:1];
+        [[NSWorkspace sharedWorkspace] launchApplication:[NSString stringWithFormat:@"/Applications/%@", appName]];
+        NSLog(@"%@", [NSString stringWithFormat:@"/Applications/%@", appName]);
+        return true;
+    }
+    return false;
+}
+
+-(NSString*)transChineseStringToPingyin:(NSString*)szString{
+    if ([szString length]) {
+        NSMutableString *ms = [[NSMutableString alloc] initWithString:szString];
+        if (CFStringTransform((__bridge CFMutableStringRef)ms, 0, kCFStringTransformMandarinLatin, NO)) {}
+        if (CFStringTransform((__bridge CFMutableStringRef)ms, 0, kCFStringTransformStripDiacritics, NO)) {}
+        return [[ms stringByReplacingOccurrencesOfString:@" " withString:@""] lowercaseString];
+    }
+    return @"";
 }
 
 @end
