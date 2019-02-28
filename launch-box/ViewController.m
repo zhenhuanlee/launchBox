@@ -13,6 +13,10 @@
     NSTableCellView *_cellView;
     NSMutableArray *_apps;
     NSMutableArray *_matchedApps;
+    NSScrollView *_tableContainerView;
+    NSScreen *_screen;
+    float _rowHeight;
+    float _baseHeight;
 }
 
 @property (weak) IBOutlet NSTextField *searchBox;
@@ -25,12 +29,16 @@
     [super viewDidLoad];
     _apps = [NSMutableArray array];
     _matchedApps = [NSMutableArray array];
+    _rowHeight = 30;
+    _screen = [NSScreen mainScreen];
 
     // Do any additional setup after loading the view.
     [self createTableView];
     [self editSearchBoxView];
     
-    [self getFilesUnderApplicationFolder ];
+    _baseHeight = self.view.frame.size.height;
+    
+    [self getFilesUnderApplicationFolder];
 }
 
 
@@ -51,6 +59,13 @@
     }
     
     [_tableView reloadData];
+    CGPoint oPoint = self.view.window.frame.origin;
+    float height = _rowHeight * [_matchedApps count];
+    
+    [_tableContainerView setFrameSize:CGSizeMake(_tableContainerView.frame.size.width, height)];
+    float containerHeight = _tableContainerView.frame.size.height + _baseHeight;
+    float yPoint = _screen.frame.size.height - containerHeight - 100;
+    [self.view.window setFrame:CGRectMake(oPoint.x, yPoint, self.view.frame.size.width, containerHeight) display:YES];
 }
 
 - (void)createTableView {
@@ -58,6 +73,7 @@
     //
     _tableView = [[NSTableView alloc] init];
     [_tableView setHeaderView:nil];
+    [_tableView setBackgroundColor:[NSColor clearColor]];
     [_tableView setDelegate:self];
     [_tableView setDataSource:self];
     
@@ -67,11 +83,11 @@
     [_tableView addTableColumn:column];
     
     //
-    NSScrollView *tableContainerView = [[NSScrollView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height-50)];
+    _tableContainerView = [[NSScrollView alloc] initWithFrame:CGRectMake(10, 0, size.width-20, size.height-50)];
+    [_tableContainerView setDrawsBackground:NO];
     
-    [tableContainerView setDocumentView:_tableView];
-    
-    [self.view addSubview:tableContainerView];
+    [_tableContainerView setDocumentView:_tableView];
+    [self.view addSubview:_tableContainerView];
 }
 
 - (void)editSearchBoxView {
@@ -87,21 +103,21 @@
 }
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
-    return 30;
+    return _rowHeight;
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    NSString *strIdt = @"123";
+    NSString *strIdt = @"xxxi";
     NSTextField *cell = [tableView makeViewWithIdentifier:strIdt owner:self];
     if (!cell) {
-//        cell = [[NSTableCellView alloc] init];
         cell = [[NSTextField alloc] init];
         cell.identifier = strIdt;
     }
+    [cell setFont:[NSFont systemFontOfSize:20]];
     [cell setEditable:NO];
     cell.wantsLayer = YES;
-    [cell setBackgroundColor:[NSColor clearColor]];
     [cell setBordered:NO];
+    [cell setBackgroundColor:[NSColor clearColor]];
     cell.stringValue = [[_matchedApps objectAtIndex:row] objectAtIndex:1];
     return cell;
 }
